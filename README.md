@@ -39,7 +39,7 @@ References
 ----------
 `brew help`, `man brew`, or the Homebrew [wiki][].
 
-[team]: https://our.intern.facebook.com/intern/opensource/team/?tid=1074534
+[team]: https://our.intern.facebook.com/intern/opensource/team/?tid=1079344
 [ssh]: https://github.com/settings/ssh
 [token]: https://github.com/settings/applications#personal-access-tokens
 [wiki]:http://wiki.github.com/mxcl/homebrew
