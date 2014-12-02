@@ -33,6 +33,9 @@ Installing something
 --------------------
 
     brew install fbthrift-compiler
+
+Note: you will have to make sure you've agreed to the XCode License, otherwise build will fail during installation. You can run xcodebuild -license in your Mac command shell in lieu of the GUI app.
+
     thrift1 --version
 
 References
