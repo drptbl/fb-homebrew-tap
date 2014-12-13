@@ -2,9 +2,9 @@ require "formula"
 
 class FbthriftCompiler < Formula
   homepage "https://github.com/facebook/fbthrift"
-  url "https://github.com/facebook/fbthrift/archive/41f744551ff26b852957e7ac4f01344b2bc761d8.tar.gz"
-  version "11.0"
-  sha1 "f3f705ae2685cc908d5e6fa73c45674ab7a39251"
+  url "https://github.com/facebook/fbthrift/archive/7d8e1dcec59024e526e6768d3d4a66f6c4abe5ac.tar.gz"
+  version "15.0"
+  sha1 "69c27545ee0b717ffd30a37a9bc6665c02016f73"
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build

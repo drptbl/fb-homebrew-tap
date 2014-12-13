@@ -50,6 +50,6 @@ References
 Contact
 -------
 
-As of 2014-10-14, these formulae are approximately maintained by
+As of 2014-12-12, these formulae are approximately maintained by
 `jsailor`.
 

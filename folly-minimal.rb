@@ -2,9 +2,9 @@ require "formula"
 
 class FollyMinimal < Formula
   homepage "https://github.com/facebook/folly"
-  url "https://github.com/facebook/folly/archive/5617e556f7b806027b0105996a8f1f45ea294d49.tar.gz"
-  version "11.0"
-  sha1 "660af9ca8423bd1870a91bbe4c64c7fa7a40bcbd"
+  url "https://github.com/facebook/folly/archive/61e26ae9a52ae2c66f752191cff76613feca5bbc.tar.gz"
+  version "18.0"
+  sha1 "7c22815cf82b05391b897e0dafe35fe3e7bdc1a5"
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
@@ -19,28 +19,13 @@ class FollyMinimal < Formula
   depends_on "jemalloc"
   depends_on "double-conversion"
 
+  patch :p1, :DATA
+
   def install
     cd "folly"
 
-    # Remove the headers at compile-time so we can be sure they're actually
-    # unused. Otherwise, a compile might succeed, but the headers won't be
-    # installed causing failures for projects that use us.
-    # Except the test ones.
-    system "rm",
-        * %w{
-          Benchmark.h detail/Futex.h detail/MemoryIdler.h
-          experimental/Bits.h experimental/EliasFanoCoding.h
-          experimental/EventCount.h experimental/io/FsUtil.h
-          experimental/TestUtil.h experimental/wangle/concurrent/Codel.h
-          experimental/wangle/ConnectionManager.h
-          experimental/wangle/ManagedConnection.h
-          io/Compression.h LifoSem.h Subprocess.h
-          wangle/Executor.h wangle/Future-inl.h wangle/Future.h
-          wangle/GenericThreadGate.h wangle/InlineExecutor.h wangle/Later-inl.h
-          wangle/Later.h wangle/ManualExecutor.h wangle/Promise-inl.h
-          wangle/Promise.h wangle/ThreadGate.h wangle/Try-inl.h wangle/Try.h
-          wangle/WangleException.h wangle/detail/State.h
-        }
+    system "rm", "-rf",
+            "wangle", "experimental/wangle", "io/async"
 
     system "autoreconf", "-i"
 
@@ -54,206 +39,199 @@ class FollyMinimal < Formula
 
     system "make", "install"
   end
-
-  patch :p0, :DATA
 end
 
 __END__
-diff -ru folly/Makefile.am folly/Makefile.am
---- folly/Makefile.am	2014-10-09 12:01:47.000000000 -0700
-+++ folly/Makefile.am	2014-10-10 12:53:36.000000000 -0700
-@@ -4,16 +4,11 @@
- 
- CLEANFILES =
- 
--noinst_PROGRAMS = generate_fingerprint_tables
--generate_fingerprint_tables_SOURCES = build/GenerateFingerprintTables.cpp
--generate_fingerprint_tables_LDADD = libfollybase.la
--
- noinst_LTLIBRARIES = \
- 	libfollybase.la
- 
- lib_LTLIBRARIES = \
--	libfolly.la \
--	libfollybenchmark.la
-+	libfolly.la
- 
- follyincludedir = $(includedir)/folly
- 
-@@ -28,7 +23,6 @@
- 	AtomicHashMap-inl.h \
- 	AtomicStruct.h \
- 	Baton.h \
--	Benchmark.h \
- 	Bits.h \
- 	Checksum.h \
- 	Chrono.h \
-@@ -42,12 +36,10 @@
+diff -ru orig/folly/Makefile.am mod/folly/Makefile.am
+--- orig/folly/Makefile.am	2014-12-11 08:02:41.000000000 -0800
++++ mod/folly/Makefile.am	2014-12-12 16:44:49.000000000 -0800
+@@ -42,7 +42,6 @@
+ 	detail/BitsDetail.h \
+ 	detail/CacheLocality.h \
+ 	detail/ChecksumDetail.h \
+-	detail/Clock.h \
+ 	detail/DiscriminatedPtrDetail.h \
  	detail/ExceptionWrapper.h \
  	detail/FileUtilDetail.h \
- 	detail/FingerprintPolynomial.h \
- 	detail/FunctionalExcept.h \
--	detail/Futex.h \
- 	detail/GroupVarintDetail.h \
- 	detail/IPAddress.h \
- 	detail/Malloc.h \
--	detail/MemoryIdler.h \
- 	detail/MPMCPipelineDetail.h \
- 	detail/SlowFingerprint.h \
- 	detail/Stats.h \
-@@ -66,14 +56,6 @@
- 	Exception.h \
- 	ExceptionWrapper.h \
- 	EvictingCacheMap.h \
--	experimental/Bits.h \
--	experimental/EliasFanoCoding.h \
--	experimental/EventCount.h \
--	experimental/io/FsUtil.h \
--	experimental/TestUtil.h \
+@@ -72,47 +71,6 @@
+ 	experimental/io/FsUtil.h \
+ 	experimental/Singleton.h \
+ 	experimental/TestUtil.h \
+-	experimental/wangle/channel/AsyncSocketHandler.h \
+-	experimental/wangle/channel/ChannelHandler.h \
+-	experimental/wangle/channel/ChannelHandlerContext.h \
+-	experimental/wangle/channel/ChannelPipeline.h \
+-	experimental/wangle/channel/OutputBufferingHandler.h \
+-	experimental/wangle/concurrent/BlockingQueue.h \
 -	experimental/wangle/concurrent/Codel.h \
+-	experimental/wangle/concurrent/CPUThreadPoolExecutor.h \
+-	experimental/wangle/concurrent/FutureExecutor.h \
+-	experimental/wangle/concurrent/IOThreadPoolExecutor.h \
+-	experimental/wangle/concurrent/LifoSemMPMCQueue.h \
+-	experimental/wangle/concurrent/NamedThreadFactory.h \
+-	experimental/wangle/concurrent/ThreadFactory.h \
+-	experimental/wangle/concurrent/ThreadPoolExecutor.h \
+-	experimental/wangle/rx/Observable.h \
+-	experimental/wangle/rx/Observer.h \
+-	experimental/wangle/rx/Subject.h \
+-	experimental/wangle/rx/Subscription.h \
+-	experimental/wangle/rx/types.h \
 -	experimental/wangle/ConnectionManager.h \
 -	experimental/wangle/ManagedConnection.h \
+-	experimental/wangle/acceptor/Acceptor.h \
+-	experimental/wangle/acceptor/ConnectionCounter.h \
+-	experimental/wangle/acceptor/SocketOptions.h \
+-	experimental/wangle/acceptor/DomainNameMisc.h \
+-	experimental/wangle/acceptor/LoadShedConfiguration.h \
+-	experimental/wangle/acceptor/NetworkAddress.h \
+-	experimental/wangle/acceptor/ServerSocketConfig.h \
+-	experimental/wangle/acceptor/TransportInfo.h \
+-	experimental/wangle/ssl/ClientHelloExtStats.h \
+-	experimental/wangle/ssl/DHParam.h \
+-	experimental/wangle/ssl/PasswordInFile.h \
+-	experimental/wangle/ssl/SSLCacheOptions.h \
+-	experimental/wangle/ssl/SSLCacheProvider.h \
+-	experimental/wangle/ssl/SSLContextConfig.h \
+-	experimental/wangle/ssl/SSLContextManager.h \
+-	experimental/wangle/ssl/SSLSessionCacheManager.h \
+-	experimental/wangle/ssl/SSLStats.h \
+-	experimental/wangle/ssl/SSLUtil.h \
+-	experimental/wangle/ssl/TLSTicketKeyManager.h \
+-	experimental/wangle/ssl/TLSTicketKeySeeds.h \
  	FBString.h \
  	FBVector.h \
  	File.h \
-@@ -106,7 +88,6 @@
- 	IPAddressException.h \
- 	IndexedMemPool.h \
- 	IntrusiveList.h \
--	io/Compression.h \
- 	io/Cursor.h \
- 	io/IOBuf.h \
- 	io/IOBufQueue.h \
-@@ -125,7 +106,6 @@
- 	io/async/TimeoutManager.h \
+@@ -154,27 +112,6 @@
+ 	io/RecordIO-inl.h \
+ 	io/TypedIOBuf.h \
+ 	io/ShutdownSocketSet.h \
+-	io/async/AsyncTimeout.h \
+-	io/async/AsyncTransport.h \
+-	io/async/AsyncServerSocket.h \
+-	io/async/AsyncSSLServerSocket.h \
+-	io/async/AsyncSocket.h \
+-	io/async/AsyncSSLSocket.h \
+-	io/async/AsyncSocketException.h \
+-	io/async/DelayedDestruction.h \
+-	io/async/EventBase.h \
+-	io/async/EventBaseManager.h \
+-	io/async/EventFDWrapper.h \
+-	io/async/EventHandler.h \
+-	io/async/EventUtil.h \
+-	io/async/NotificationQueue.h \
+-	io/async/HHWheelTimer.h \
+-	io/async/Request.h \
+-	io/async/SSLContext.h \
+-	io/async/TimeoutManager.h \
+-	io/async/test/TimeUtil.h \
+-	io/async/test/UndelayedDestruction.h \
+-	io/async/test/Util.h \
  	json.h \
  	Lazy.h \
--	LifoSem.h \
- 	Likely.h \
- 	Logging.h \
- 	MacAddress.h \
-@@ -161,12 +141,7 @@
- 	stats/MultiLevelTimeSeries.h \
- 	String.h \
- 	String-inl.h \
--	Subprocess.h \
- 	Synchronized.h \
--	test/FBStringTestBenchmarks.cpp.h \
--	test/FBVectorTestBenchmarks.cpp.h \
--	test/function_benchmark/benchmark_impl.h \
--	test/function_benchmark/test_functions.h \
- 	test/SynchronizedTestLib.h \
- 	test/SynchronizedTestLib-inl.h \
- 	ThreadCachedArena.h \
-@@ -179,22 +154,7 @@
+ 	LifoSem.h \
+@@ -231,23 +168,7 @@
  	Uri.h \
  	Uri-inl.h \
  	Varint.h \
 -	VersionCheck.h \
+-	wangle/Deprecated.h \
 -	wangle/Executor.h \
 -	wangle/Future-inl.h \
 -	wangle/Future.h \
--	wangle/GenericThreadGate.h \
 -	wangle/InlineExecutor.h \
--	wangle/Later-inl.h \
--	wangle/Later.h \
 -	wangle/ManualExecutor.h \
+-	wangle/OpaqueCallbackShunt.h \
 -	wangle/Promise-inl.h \
 -	wangle/Promise.h \
--	wangle/ThreadGate.h \
+-	wangle/QueuedImmediateExecutor.h \
+-	wangle/ScheduledExecutor.h \
 -	wangle/Try-inl.h \
 -	wangle/Try.h \
 -	wangle/WangleException.h \
--	wangle/detail/State.h
+-	wangle/detail/Core.h \
+-	wangle/detail/FSM.h
 +	VersionCheck.h
  
  FormatTables.cpp: build/generate_format_tables.py
  	build/generate_format_tables.py
-@@ -225,15 +185,11 @@
- 	dynamic.cpp \
- 	File.cpp \
- 	FileUtil.cpp \
--	FingerprintTables.cpp \
--	detail/Futex.cpp \
- 	GroupVarint.cpp \
- 	GroupVarintTables.cpp \
- 	IPAddress.cpp \
- 	IPAddressV4.cpp \
- 	IPAddressV6.cpp \
--	LifoSem.cpp \
--	io/Compression.cpp \
- 	io/IOBuf.cpp \
+@@ -291,18 +212,6 @@
  	io/IOBufQueue.cpp \
  	io/RecordIO.cpp \
-@@ -243,7 +199,6 @@
- 	io/async/Request.cpp \
- 	io/async/HHWheelTimer.cpp \
+ 	io/ShutdownSocketSet.cpp \
+-	io/async/AsyncTimeout.cpp \
+-	io/async/AsyncServerSocket.cpp \
+-	io/async/AsyncSSLServerSocket.cpp \
+-	io/async/AsyncSocket.cpp \
+-	io/async/AsyncSSLSocket.cpp \
+-	io/async/EventBase.cpp \
+-	io/async/EventBaseManager.cpp \
+-	io/async/EventHandler.cpp \
+-	io/async/Request.cpp \
+-	io/async/SSLContext.cpp \
+-	io/async/HHWheelTimer.cpp \
+-	io/async/test/TimeUtil.cpp \
  	json.cpp \
--	detail/MemoryIdler.cpp \
+ 	detail/MemoryIdler.cpp \
  	MacAddress.cpp \
- 	MemoryMapping.cpp \
- 	Random.cpp \
-@@ -252,19 +207,10 @@
- 	SpookyHashV1.cpp \
- 	SpookyHashV2.cpp \
- 	stats/Instantiations.cpp \
--	Subprocess.cpp \
- 	ThreadCachedArena.cpp \
+@@ -318,26 +227,9 @@
  	TimeoutQueue.cpp \
  	Uri.cpp \
--	Version.cpp \
+ 	Version.cpp \
 -	wangle/InlineExecutor.cpp \
 -	wangle/ManualExecutor.cpp \
--	wangle/ThreadGate.cpp \
--	experimental/io/FsUtil.cpp \
+ 	experimental/io/FsUtil.cpp \
+ 	experimental/Singleton.cpp \
 -	experimental/TestUtil.cpp \
+-	experimental/wangle/concurrent/CPUThreadPoolExecutor.cpp \
 -	experimental/wangle/concurrent/Codel.cpp \
+-	experimental/wangle/concurrent/IOThreadPoolExecutor.cpp \
+-	experimental/wangle/concurrent/ThreadPoolExecutor.cpp \
 -	experimental/wangle/ConnectionManager.cpp \
--	experimental/wangle/ManagedConnection.cpp
-+	Version.cpp
+-	experimental/wangle/ManagedConnection.cpp \
+-	experimental/wangle/acceptor/Acceptor.cpp \
+-	experimental/wangle/acceptor/SocketOptions.cpp \
+-	experimental/wangle/acceptor/LoadShedConfiguration.cpp \
+-	experimental/wangle/acceptor/TransportInfo.cpp \
+-	experimental/wangle/ssl/PasswordInFile.cpp \
+-	experimental/wangle/ssl/SSLContextManager.cpp \
+-	experimental/wangle/ssl/SSLSessionCacheManager.cpp \
+-	experimental/wangle/ssl/SSLUtil.cpp \
+-	experimental/wangle/ssl/TLSTicketKeyManager.cpp
++	experimental/TestUtil.cpp
  
  if HAVE_LINUX
  nobase_follyinclude_HEADERS += \
-@@ -273,28 +219,21 @@
+@@ -346,7 +238,7 @@
  	experimental/io/HugePages.cpp
  endif
  
- if !HAVE_LINUX
+-if !HAVE_LINUX
++if !HAVE_CLOCK_GETTIME
  nobase_follyinclude_HEADERS += detail/Clock.h
  libfollybase_la_SOURCES += detail/Clock.cpp
  endif
+diff -ru orig/folly/configure.ac mod/folly/configure.ac
+--- orig/folly/configure.ac	2014-12-11 08:02:41.000000000 -0800
++++ mod/folly/configure.ac	2014-12-12 16:54:55.000000000 -0800
+@@ -260,11 +260,16 @@
+ # Check for clock_gettime(2). This is not in an AC_CHECK_FUNCS() because we
+ # want to link with librt if necessary.
+ AC_SEARCH_LIBS([clock_gettime], [rt],
+-  AC_DEFINE(
+-    [HAVE_CLOCK_GETTIME],
+-    [1],
+-    [Define to 1 if we support clock_gettime(2).]),
+-  [])
++  [
++    AC_DEFINE(
++      [HAVE_CLOCK_GETTIME],
++      [1],
++      [Define to 1 if we support clock_gettime(2).]),
++    AM_CONDITIONAL([HAVE_CLOCK_GETTIME], [true])
++  ],
++  [
++    AM_CONDITIONAL([HAVE_CLOCK_GETTIME], [false])
++  ])
  
- if !HAVE_WEAK_SYMBOLS
- libfollybase_la_SOURCES += detail/MallocImpl.cpp
- endif
- 
- if !HAVE_BITS_FUNCTEXCEPT
- libfollybase_la_SOURCES += detail/FunctionalExcept.cpp
- endif
- 
- libfollybase_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LT_VERSION)
- 
- libfolly_la_LIBADD = libfollybase.la
- libfolly_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LT_VERSION)
- 
--FingerprintTables.cpp: generate_fingerprint_tables
--	./generate_fingerprint_tables
--CLEANFILES += FingerprintTables.cpp
--
--libfollybenchmark_la_SOURCES = Benchmark.cpp
--libfollybenchmark_la_LIBADD = libfolly.la
--libfollybenchmark_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LT_VERSION)
-diff -ru folly/SocketAddress.h folly/SocketAddress.h
---- folly/SocketAddress.h	2014-10-09 12:01:47.000000000 -0700
-+++ folly/SocketAddress.h	2014-10-10 12:38:17.000000000 -0700
-@@ -20,7 +20,9 @@
- #include <sys/socket.h>
- #include <sys/un.h>
- #include <netinet/in.h>
--#include <features.h>
-+#ifdef HAVE_FEATURES_H
-+# include <features.h>
-+#endif
- #include <netdb.h>
- #include <cstddef>
- #include <iostream>
+ # Checks for library functions.
+ AC_CHECK_FUNCS([getdelim \
