@@ -9,7 +9,7 @@ Setup
 This is unfortunately complicated.
 
 1. [Join the GitHub team][team] associated with this repository. If you're
-reading this docuyment, you've probably already done so.
+reading this document, you've probably already done so.
 
 2. If you haven't yet set up GitHub to work with your laptop, you'll need to
 [add your laptop's SSH key][ssh] to your GitHub account.
