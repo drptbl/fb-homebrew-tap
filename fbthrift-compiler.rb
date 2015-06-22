@@ -2,9 +2,11 @@ require "formula"
 
 class FbthriftCompiler < Formula
   homepage "https://github.com/facebook/fbthrift"
-  url "https://github.com/facebook/fbthrift/archive/7d8e1dcec59024e526e6768d3d4a66f6c4abe5ac.tar.gz"
-  version "15.0"
-  sha1 "69c27545ee0b717ffd30a37a9bc6665c02016f73"
+  url "https://github.com/facebook/fbthrift/archive/fc092e2b645def21482c1772250a97a7cd003cee.tar.gz"
+  version "27.0"
+  sha1 "9593609047140574fbbdb1e443c9f748dbaa2538"
+
+  head "https://github.com/facebook/fbthrift.git"
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
@@ -12,7 +14,7 @@ class FbthriftCompiler < Formula
 
   depends_on "glog"
   depends_on "boost"
-  depends_on "folly-minimal"
+  depends_on "folly"
 
   def install
     cd "thrift"
