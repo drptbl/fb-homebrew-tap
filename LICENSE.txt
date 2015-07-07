@@ -1,5 +1,0 @@
-Copyright 2014, Facebook, Inc.
-
-This software is not yet ready for public release. When it is, distribution
-will be under the two-clause BSD license:
-https://raw.githubusercontent.com/Homebrew/homebrew/master/LICENSE.txt

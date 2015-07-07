@@ -1,55 +1,90 @@
-Homebrew Facebook
-=================
+Facebook Homebrew Tap
+=====================
 
-This is a homebrew tap for Facebook specific formulae.
+This is a [Homebrew][brew] tap for formulae for software developed by Facebook.
+
 
 Setup
 -----
 
-This is unfortunately complicated.
+Using these formulae requires Homebrew, which in turn requires Xcode. If you
+have not yet installed Homebrew, a quick summary is at the end of this
+document.
 
-1. [Join the GitHub team][team] associated with this repository. If you're
-reading this document, you've probably already done so.
+Once homebrew is installed, simply run:
 
-2. If you haven't yet set up GitHub to work with your laptop, you'll need to
-[add your laptop's SSH key][ssh] to your GitHub account.
+    brew tap facebook/fb-homebrew-tap
 
-3. Since Homebrew currently only supports cloning new taps via `https`, you'll
-need to make a Personal Access Token for yourself. Visit the ["Applications"
-section of your GitHub settings][token], click "Generate a new token", enter
-some name such as `homebrew-clowny-2014-10-14`, ensure the `repo` scope is
-checked (others don't matter), and click "Generate". Do not close the page.
+Some of these formulae may require OS X 10.10 (Yosemite) or higher.
 
-4. Run `brew tap facebook/homebrew-tap`. When asked for a username, enter your
-GitHub username; when asked for a password, copy-paste the token from before.
-It should clone the tap and print a message like "Tapped 3 formulae". It should
-also print a message about how to use `git remote set-url` to avoid entering
-your access token each time. Do what it says. After that, you can delete the
-access token from your GitHub account, if you want.
 
-This could be simpler if an option like `brew tap --ssh` existed. Hint, hint.
+Use
+---
 
-Installing something
---------------------
+To install software, just use `brew install` with the name of the formula. You
+may wish to run `brew update` before hand to get the latest version of the
+formulae. For example, to install the latest version of the thrift compiler:
 
+    brew update
     brew install fbthrift-compiler
 
-Note: you will have to make sure you've agreed to the XCode License, otherwise build will fail during installation. You can run xcodebuild -license in your Mac command shell in lieu of the GUI app.
+To upgrade software:
 
-    thrift1 --version
+    brew update
+    brew upgrade    # upgrade all software installed with Homebrew
+    brew upgrade fbthrift-compiler   # update just the thrift compiler
+
+
+Contributing
+------------
+
+We use GitHub's [issue tracker][issue] for bug reports or feature requests.
+
+To do development on these formulae, first fork the repository on GitHub. Add
+your fork as a remote to your local clone:
+
+    cd $(brew --prefix)/Library/Taps/facebook/fb-homebrew-tap
+    git remote add me git@github.com:YOUR_GITHUB_USERNAME/fb-homebrew-tap.git
+    git fetch me
+
+To propose changes, push to your fork (e.g. with `git push me +master`) and
+submit pull request on GitHub.
+
+If you do not work for Facebook, you will need to [submit a Contributor License
+Agreement ("CLA")][cla]. You only need to do this once to work on any of
+Facebook's open source projects.
+
+We follow Homebrew's [standard coding style][style].
+
+
+Appendix: overview of installing Homebrew
+-----------------------------------------
+
+The Homebrew developers suggest installing Homebrew at `/usr/local` to maximize
+compatibility with existing software. To do so, follow the instructions on
+[their website][brew].
+
+This author prefers `/opt/homebrew`, finding that it works well enough in
+practice and keeps a cleaner separation between other software which might use
+`/usr/local`. To install at `/opt/homebrew`, you can use:
+
+    sudo mkdir /opt/homebrew
+    sudo chown `whoami` /opt/homebrew
+    curl -sSLf -o homebrew-installer https://raw.githubusercontent.com/Homebrew/install/master/install
+    perl -pi -e s,/usr/local,/opt/homebrew, homebrew-installer
+    ruby homebrew-installer
+    rm homebrew-installer
+    echo '$PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"' >> ~/.bashrc
+
 
 References
 ----------
-`brew help`, `man brew`, or the Homebrew [wiki][].
+`brew help`, `man brew`, or the Homebrew [documentation][].
 
-[team]: https://our.intern.facebook.com/intern/opensource/team/?tid=1079344
-[ssh]: https://github.com/settings/ssh
-[token]: https://github.com/settings/applications#personal-access-tokens
-[wiki]:http://wiki.github.com/mxcl/homebrew
+[brew]: http://brew.sh/
+[issue]: https://github.com/facebook/fb-homebrew-tap/issues
+[cla]: https://code.facebook.com/cla
+[style]: https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Formula-Cookbook.md
+[documentation]: https://github.com/Homebrew/homebrew/tree/master/share/doc/homebrew#readme
 
-Contact
--------
-
-As of 2014-12-12, these formulae are approximately maintained by
-`jsailor`.
 
