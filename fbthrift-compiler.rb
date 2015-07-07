@@ -1,10 +1,9 @@
-require "formula"
-
 class FbthriftCompiler < Formula
+  desc "IDL compiler from Facebook's Thrift, an RPC system"
   homepage "https://github.com/facebook/fbthrift"
-  url "https://github.com/facebook/fbthrift/archive/fc092e2b645def21482c1772250a97a7cd003cee.tar.gz"
-  version "27.0"
-  sha1 "9593609047140574fbbdb1e443c9f748dbaa2538"
+  url "https://github.com/facebook/fbthrift/archive/v0.28.0.tar.gz"
+  version "28.0"
+  sha256 "1aa577d313c24950be1f0bb9681c4c959ce010a7ba298870c3f9a5b54c6cdc61"
 
   head "https://github.com/facebook/fbthrift.git"
 
@@ -16,23 +15,56 @@ class FbthriftCompiler < Formula
   depends_on "boost"
   depends_on "folly"
 
+  # 1. Thrift's configure.ac conflates the cpp runtime with the compiler. Even
+  # if we specify `--without-cpp` to skip the checks for e.g. numa which isn't
+  # available on OSX, the configure ends up forcing WITH_CPP=true anyway which
+  # tries to build the cpp runtime in lib.  We work around that by explicitly
+  # removing lib from the list of SUBDIRS to process.
+  # 2. The build process for the python chunk of the compiler doesn't really
+  # work too well. But that's ok, because it's optional, and the cpp half
+  # doesn't know how to call the python half on OSX anyway. So exclude that
+  # too.
+  # For details, see:
+  #  https://github.com/facebook/fbthrift/issues/102
+  #  https://github.com/facebook/fbthrift/issues/62
+  #  https://github.com/facebook/fbthrift/issues/50
+  #  https://github.com/facebook/fbthrift/issues/21
+  patch :p1, :DATA
+
   def install
-    cd "thrift"
+    cd "thrift" do
+      system "autoreconf", "-i"
 
-    system "autoreconf", "-i"
+      system "./configure",
+          "--disable-debug",
+          "--disable-dependency-tracking",
+          "--disable-silent-rules",
+          "--prefix=#{prefix}",
+          "--without-python", # see patch comment above
+          "--without-cpp" # see patch comment above
 
-    system "./configure",
-        "--disable-debug",
-        "--disable-dependency-tracking",
-        "--disable-silent-rules",
-        "--prefix=#{prefix}",
-        "--without-python",  # it dumps random stuff places
-        "--without-cpp"  # requires event libraries, numa, stuff we don't have
-
-    system "make", "install"
+      system "make", "install"
+    end
   end
 
-  patch :p1, :DATA
+  test do
+    (testpath/"basic.thrift").write <<-EOF.undent
+      enum MyEnum { Val1, Val2 }
+      struct MyStruct {
+        1: i64 f1,
+        2: string f2,
+      }
+      service MyService {
+        string doThing(1: MyStruct arg);
+      }
+    EOF
+
+    system "#{bin}/thrift1", "-gen", "java", (testpath/"basic.thrift")
+
+    %w[MyEnum.java MyStruct.java MyService.java].each do |file|
+      assert (testpath/"gen-java"/file).exist?
+    end
+  end
 end
 
 __END__
@@ -58,23 +90,3 @@ __END__
  bin_PROGRAMS = thrift1
  
  noinst_LTLIBRARIES = libparse.la libthriftcompilerbase.la
---- a/thrift/compiler/generate/t_rb_generator.cc	2014-10-10 14:36:02.000000000 -0700
-+++ b/thrift/compiler/generate/t_rb_generator.cc	2014-10-10 14:37:03.000000000 -0700
-@@ -312,7 +312,7 @@
-     //Populate the hash
-     int32_t value = (*c_iter)->get_value();
- 
--    first ? first = false : f_types_ << ", ";
-+    if (first) first = false; else f_types_ << ", ";
-     f_types_ << value << " => \"" << capitalize((*c_iter)->get_name()) << "\"";
- 
-   }
-@@ -323,7 +323,7 @@
-   first = true;
-   for (c_iter = constants.begin(); c_iter != constants.end(); ++c_iter) {
-     // Populate the set
--    first ? first = false: f_types_ << ", ";
-+    if (first) first = false; else f_types_ << ", ";
-     f_types_ << capitalize((*c_iter)->get_name());
-   }
-   f_types_ << "]).freeze" << endl;
