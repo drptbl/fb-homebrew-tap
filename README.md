@@ -13,7 +13,7 @@ document.
 
 Once homebrew is installed, simply run:
 
-    brew tap facebook/fb-homebrew-tap
+    brew tap facebook/fb-homebrew-tap https://github.com/facebook/fb-homebrew-tap
 
 Some of these formulae may require OS X 10.10 (Yosemite) or higher.
 
@@ -43,7 +43,7 @@ We use GitHub's [issue tracker][issue] for bug reports or feature requests.
 To do development on these formulae, first fork the repository on GitHub. Add
 your fork as a remote to your local clone:
 
-    cd $(brew --prefix)/Library/Taps/facebook/fb-homebrew-tap
+    cd $(brew --prefix)/Library/Taps/facebook/homebrew-fb-homebrew-tap
     git remote add me git@github.com:YOUR_GITHUB_USERNAME/fb-homebrew-tap.git
     git fetch me
 
